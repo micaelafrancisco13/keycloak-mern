@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  keycloak-db:
+    image: postgres:17.2
+    container_name: keycloak-db
+    environment:
+      POSTGRES_USER: micaelafrancisco
+      POSTGRES_PASSWORD: "Mypassword13."
+      POSTGRES_DB: keycloak
+    volumes:
+      - keycloak-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      # Database configuration
+      KC_DB: postgres
+      KC_DB_USERNAME: micaelafrancisco
+      KC_DB_PASSWORD: "Mypassword13."
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_URL_PORT: 5432
+
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak-db
+    command: ["start-dev"]
+    restart: unless-stopped
+
+volumes:
+  keycloak-db:
