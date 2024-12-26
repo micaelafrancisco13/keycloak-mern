@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import Home from "./components/Home.tsx"
+import CallbackSignIn from "./components/CallbackSignIn.tsx"
+import LandingPage from "./components/LandingPage.tsx"
+import LoginPage from "./components/LoginPage.tsx"
+import { useEffect } from "react"
+import useAuth from "./hooks/useAuth.ts"
+import PrivateRoutes from "./components/PrivateRoutes.tsx"
+import UserProfile from "./components/UserProfile.tsx"
 
 function App() {
-  const [count, setCount] = useState(0)
+	const { getCurrentUser } = useAuth()
+	const user = getCurrentUser()
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	useEffect(() => {
+		console.log("User", user)
+	}, [user])
+
+	const router = createBrowserRouter([
+		{
+			path: "/",
+			element: user ? <Home /> : <LandingPage />
+		},
+		{
+			path: "/callback",
+			element: <CallbackSignIn />
+		},
+		{
+			path: "/login",
+			element: <LoginPage />
+		},
+		{
+			element: <PrivateRoutes />,
+			children: [{
+				path: "/user-profile",
+				element: <UserProfile />
+			}]
+		}
+	])
+	return (
+		<>
+			<RouterProvider router={router} />
+		</>
+	)
 }
 
 export default App
